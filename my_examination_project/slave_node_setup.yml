@@ -1,0 +1,58 @@
+---
+- name: Install Dependencies and Clone Laravel
+  hosts: 192.168.20.11
+  become: yes
+  tasks:
+    - name: Gather facts
+      setup:
+
+    - name: Update and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: safe
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - php-mysql
+        - git
+
+    - name: Clone Laravel from GitHub
+      git:
+        repo: https://github.com/laravel/laravel
+        dest: /var/www/html/laravel
+      ignore_errors: yes
+      register: laravel_repo
+
+    - name: Configure Apache
+      copy:
+        src: /var/www/html/laravel/.env.example
+        dest: /var/www/html/laravel/.env
+        owner: www-data
+        group: www-data
+      when: laravel_repo is not failed
+
+    - name: Enable Apache rewrite module
+      apache2_module:
+        state: present
+        name: rewrite
+      when: laravel_repo is not failed
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+      when: laravel_repo is not failed
+
+    - name: Create uptime check cron job
+      cron:
+        name: Uptime Check
+        minute: 0
+        hour: 0
+        job: "/usr/bin/uptime >> /var/www/html/laravel/uptime.log"
+      when: laravel_repo is not failed

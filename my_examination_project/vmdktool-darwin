@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <VMDK_FILE>"
+  exit 1
+fi
+
+VMDK_FILE="$1"
+
+# Add your VMDK repair command here
+# For example:
+# /path/to/vmdk-repair-tool repair "$VMDK_FILE"

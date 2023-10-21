@@ -1,0 +1,21 @@
+Vagrant.configure("2") do |config|
+  # Define your Master VM configuration here
+  config.vm.define "Master" do |master|
+    master.vm.box = "ubuntu/bionic64"
+    master.vm.network "private_network", type: "static", ip: "192.168.20.10"
+    master.vm.provider "virtualbox" do |vb|
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+  end
+
+  # Define your Slave VM configuration here
+  config.vm.define "Slave" do |slave|
+    slave.vm.box = "ubuntu/bionic64"
+    slave.vm.network "private_network", type: "static", ip: "192.168.20.11"
+    slave.vm.provider "virtualbox" do |vb|
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+  end
+end
